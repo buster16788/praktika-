@@ -1,0 +1,96 @@
+import os
+
+FILE_NAME = "notes.txt"
+
+def load_notes():
+    """Загружает все заметки из файла в список строк."""
+    if not os.path.exists(FILE_NAME):
+        return []
+    with open(FILE_NAME, "r", encoding="utf-8") as f:
+        # .rstrip("\n") убирает символ переноса строки, чтобы не было пустых строк
+        return [line.rstrip("\n") for line in f]
+
+def save_notes(notes):
+    """Сохраняет список заметок обратно в файл, перезаписывая его."""
+    with open(FILE_NAME, "w", encoding="utf-8") as f:
+        for note in notes:
+            f.write(note + "\n")
+
+def show_notes(notes):
+    """Красиво выводит список с нумерацией."""
+    if not notes:
+        print("Заметок пока нет.")
+        return
+    print("\n--- Ваши заметки ---")
+    for i, note in enumerate(notes, start=1):
+        print(f"{i}. {note}")
+    print("--------------------\n")
+
+def add_note(notes):
+    text = input("Введите новую заметку: ").strip()
+    if text:
+        notes.append(text)
+        save_notes(notes)
+        print("Заметка добавлена!")
+    else:
+        print("Текст заметки не может быть пустым.")
+
+def delete_note(notes):
+    try:
+        num = int(input("Введите номер заметки для удаления: "))
+        if 1 <= num <= len(notes):
+            removed = notes.pop(num - 1)  # индекс = номер - 1
+            save_notes(notes)
+            print(f"Заметка удалена: {removed}")
+        else:
+            print("Неверный номер.")
+    except ValueError:
+        print("Пожалуйста, введите число.")
+
+def edit_note(notes):
+    try:
+        num = int(input("Введите номер заметки для редактирования: "))
+        if 1 <= num <= len(notes):
+            old_text = notes[num - 1]
+            new_text = input(f"Текущий текст: '{old_text}'. Новый текст: ").strip()
+            if new_text:
+                notes[num - 1] = new_text
+                save_notes(notes)
+                print("Заметка обновлена!")
+            else:
+                print("Текст не может быть пустым. Редактирование отменено.")
+        else:
+            print("Неверный номер.")
+    except ValueError:
+        print("Пожалуйста, введите число.")
+
+def main():
+    while True:
+        notes = load_notes()
+        show_notes(notes)
+        
+        print("Меню:")
+        print("1. Добавить заметку")
+        print("2. Удалить заметку")
+        print("3. Редактировать заметку")
+        print("4. Показать список")
+        print("0. Выход")
+        
+        choice = input("Выберите действие (0-4): ").strip()
+        
+        if choice == "1":
+            add_note(notes)
+        elif choice == "2":
+            delete_note(notes)
+        elif choice == "3":
+            edit_note(notes)
+        elif choice == "4":
+            show_notes(notes)  # дублируем на случай, если пользователь хочет только список
+        elif choice == "0":
+            print("До свидания!")
+            break
+        else:
+            print("Неверная команда, попробуйте снова.")
+
+if __name__ == "__main__":
+    main()
